@@ -14,8 +14,8 @@ public class StockLevelDTO {
     private Long stockId;
     private Integer quantityAvailable;
     private Integer quantitySold;
-    private WarehouseDTO warehouse;
-    private ProductDTO product;
+    private WarehouseDTO warehouseDTO;
+    private ProductDTO productDTO;
 
     public static StockLevelDTO fromEntity(StockLevel stockLevel) {
         if (stockLevel == null) return null;
