@@ -13,4 +13,9 @@ public class ResponseBuilder {
         return ResponseEntity.status(status)
                 .body(ApiResponse.success(status, message, data));
     }
+
+    public static <T> ResponseEntity<ApiResponse<T>> failure(HttpStatus status, String message) {
+        return ResponseEntity.status(status)
+                .body(ApiResponse.failure(status, message));
+    }
 }

@@ -1,4 +1,4 @@
-package com.ecommerce.inventory.exceptions;
+package com.commerce.wallet.exceptions;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String message) {

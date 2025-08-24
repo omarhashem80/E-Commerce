@@ -5,11 +5,13 @@ import com.ecommerce.inventory.dtos.QuantityRequest;
 import com.ecommerce.inventory.entities.Product;
 import com.ecommerce.inventory.payloads.ApiResponse;
 import com.ecommerce.inventory.services.ProductService;
+import com.ecommerce.inventory.utils.ResponseBuilder;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -22,34 +24,31 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Product>>> getProducts() {
         List<Product> products = productService.getProducts();
-        return ResponseEntity.ok(new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "success",
-                "Products fetched successfully",
+        return ResponseBuilder.build(
+                HttpStatus.OK,
+                "Products retrieved successfully",
                 products
-        ));
+        );
     }
 
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<Product>> getProductById(@PathVariable Long productId) {
         Product product = productService.getProductById(productId);
-        return ResponseEntity.ok(new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "success",
-                "Product fetched successfully",
+        return ResponseBuilder.build(
+                HttpStatus.OK,
+                "Product retrieved successfully",
                 product
-        ));
+        );
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<Product>> createProduct(@RequestBody ProductDTO productDTO) {
         Product createdProduct = productService.createProduct(productDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(
-                HttpStatus.CREATED.value(),
-                "success",
+        return ResponseBuilder.build(
+                HttpStatus.CREATED,
                 "Product created successfully",
                 createdProduct
-        ));
+        );
     }
 
     @PatchMapping("/{productId}")
@@ -57,23 +56,21 @@ public class ProductController {
             @PathVariable Long productId,
             @RequestBody Product product) {
         Product updatedProduct = productService.updateProduct(productId, product);
-        return ResponseEntity.ok(new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "success",
+        return ResponseBuilder.build(
+                HttpStatus.OK,
                 "Product updated successfully",
                 updatedProduct
-        ));
+        );
     }
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
-        return ResponseEntity.ok(new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "success",
+        return ResponseBuilder.build(
+                HttpStatus.OK,
                 "Product deleted successfully",
                 null
-        ));
+        );
     }
 
     // reserve
@@ -82,12 +79,11 @@ public class ProductController {
             @PathVariable Long productId,
             @RequestBody @Valid QuantityRequest quantity) {
         Product reservedProduct = productService.reserveQuantity(productId, quantity.getQuantity());
-        return ResponseEntity.ok(new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "success",
+        return ResponseBuilder.build(
+                HttpStatus.OK,
                 "Quantity reserved successfully",
                 reservedProduct
-        ));
+        );
     }
 
     // sell
@@ -96,12 +92,11 @@ public class ProductController {
             @PathVariable Long productId,
             @RequestBody @Valid QuantityRequest quantity) {
         Product soldProduct = productService.sellQuantity(productId, quantity.getQuantity());
-        return ResponseEntity.ok(new ApiResponse<>(
-                HttpStatus.OK.value(),
-                "success",
+        return ResponseBuilder.build(
+                HttpStatus.OK,
                 "Quantity sold successfully",
                 soldProduct
-        ));
+        );
     }
 
 

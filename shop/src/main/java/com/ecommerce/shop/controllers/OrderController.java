@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/orders")
 @AllArgsConstructor
-// TODO: Optimize details & items
 public class OrderController {
     private final OrderService orderService;
     private final ProductProxy productProxy;

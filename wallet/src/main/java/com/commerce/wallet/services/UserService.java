@@ -1,44 +1,18 @@
 package com.commerce.wallet.services;
 
 import com.commerce.wallet.entities.User;
-import com.commerce.wallet.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-public class UserService {
-    private final UserRepository userRepository;
+public interface UserService {
 
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    List<User> getAllUsers();
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+    User getUserById(Long id);
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
-    }
+    User createUser(User user);
 
-    public User createUser(User user) {
-        return userRepository.save(user);
-    }
+    User updateUser(Long id, User user);
 
-    public User updateUser(Long id, User user) {
-        if (!userRepository.findById(id).isPresent()) {
-            throw new RuntimeException("User not found");
-        }
-        return userRepository.save(user);
-    }
-
-    public void deleteUser(Long id) {
-        if (!userRepository.findById(id).isPresent()) {
-            throw new RuntimeException("User not found");
-        }
-        userRepository.deleteById(id);
-    }
+    void deleteUser(Long id);
 }

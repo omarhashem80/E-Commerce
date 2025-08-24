@@ -2,6 +2,7 @@ package com.ecommerce.shop.services;
 
 import com.ecommerce.shop.entities.CartItem;
 import com.ecommerce.shop.entities.Product;
+import com.ecommerce.shop.exceptions.NotFoundException;
 import com.ecommerce.shop.repositories.CartItemRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class CartService {
 
     public CartItem updateCartItem(Long userId, Long cartItemId, Integer quantity) {
         CartItem item = cartItemRepository.findByCartItemIdAndUserId(cartItemId, userId)
-                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+                .orElseThrow(() -> new NotFoundException("Cart item with id: " + cartItemId + " not found"));
         item.setQuantity(quantity);
         return cartItemRepository.save(item);
     }

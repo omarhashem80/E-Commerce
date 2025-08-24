@@ -4,6 +4,7 @@ import com.ecommerce.inventory.dtos.QuantityRequest;
 import com.ecommerce.inventory.dtos.StockLevelDTO;
 import com.ecommerce.inventory.services.StockLevelService;
 import com.ecommerce.inventory.payloads.ApiResponse;
+import com.ecommerce.inventory.utils.ResponseBuilder;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,35 +23,43 @@ public class StockLevelController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<StockLevelDTO>>> getAllStockLevels() {
         List<StockLevelDTO> stockLevels = stockLevelService.getAllStockLevels();
-        return ResponseEntity.ok(
-                ApiResponse.success(HttpStatus.OK, "Stock levels fetched successfully", stockLevels)
+        return ResponseBuilder.build(
+                HttpStatus.OK,
+                "Stock levels retrieved successfully",
+                stockLevels
         );
     }
 
     @GetMapping("/{stockLevelId}")
     public ResponseEntity<ApiResponse<StockLevelDTO>> getStockLevel(@PathVariable Long stockLevelId) {
         StockLevelDTO stockLevel = stockLevelService.getStockLevel(stockLevelId);
-        return ResponseEntity.ok(
-                ApiResponse.success(HttpStatus.OK, "Stock level fetched successfully", stockLevel)
+        return ResponseBuilder.build(
+                HttpStatus.OK,
+                "Stock level retrieved successfully",
+                stockLevel
         );
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<StockLevelDTO>> createStockLevel(@RequestBody StockLevelDTO stockLevelDTO) {
         StockLevelDTO created = stockLevelService.createStockLevel(stockLevelDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.success(HttpStatus.CREATED, "Stock level created successfully", created)
+        return ResponseBuilder.build(
+                HttpStatus.CREATED,
+                "Stock level created successfully",
+                created
         );
     }
 
     @PatchMapping("/{stockLevelId}/quantity")
     public ResponseEntity<ApiResponse<StockLevelDTO>> editQuantity(
             @PathVariable Long stockLevelId,
-            @RequestBody  QuantityRequest quantityRequest
+            @RequestBody QuantityRequest quantityRequest
     ) {
         StockLevelDTO updated = stockLevelService.editQuantity(stockLevelId, quantityRequest.getQuantity());
-        return ResponseEntity.ok(
-                ApiResponse.success(HttpStatus.OK, "Stock level quantity updated successfully", updated)
+        return ResponseBuilder.build(
+                HttpStatus.OK,
+                "Stock level quantity updated successfully",
+                updated
         );
     }
 
@@ -67,16 +76,20 @@ public class StockLevelController {
                 body.get("quantity"),
                 destination
         );
-        return ResponseEntity.ok(
-                ApiResponse.success(HttpStatus.OK, "Stock transferred successfully", result)
+        return ResponseBuilder.build(
+                HttpStatus.OK,
+                "Stock transferred successfully",
+                result
         );
     }
 
     @DeleteMapping("/{stockLevelId}")
     public ResponseEntity<ApiResponse<Void>> deleteStockLevel(@PathVariable Long stockLevelId) {
         stockLevelService.deleteStockLevel(stockLevelId);
-        return ResponseEntity.ok(
-                ApiResponse.success(HttpStatus.OK, "Stock level deleted successfully", null)
+        return ResponseBuilder.build(
+                HttpStatus.OK,
+                "Stock level deleted successfully",
+                null
         );
     }
 }

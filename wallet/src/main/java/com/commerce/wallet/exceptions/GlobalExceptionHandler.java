@@ -1,6 +1,7 @@
-package com.ecommerce.inventory.exceptions;
+package com.commerce.wallet.exceptions;
 
-import com.ecommerce.inventory.payloads.ApiResponse;
+import com.commerce.wallet.payloads.ApiResponse;
+import com.commerce.wallet.utils.ResponseBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,20 +15,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNotFoundException(NotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.failure(HttpStatus.NOT_FOUND, ex.getMessage()));
-    }
-
-    @ExceptionHandler(AlreadyExistsException.class)
-    public ResponseEntity<ApiResponse<Void>> handleAlreadyExistsException(AlreadyExistsException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiResponse.failure(HttpStatus.CONFLICT, ex.getMessage()));
+        return ResponseBuilder.failure(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidOperationException.class)
     public ResponseEntity<ApiResponse<Void>> handleInvalidOperationException(InvalidOperationException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.failure(HttpStatus.BAD_REQUEST, ex.getMessage()));
+        return ResponseBuilder.failure(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -38,15 +31,13 @@ public class GlobalExceptionHandler {
                 ex.getValue(),
                 ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "Unknown"
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.failure(HttpStatus.BAD_REQUEST, message));
+        return ResponseBuilder.failure(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ApiResponse<Void>> handleMissingParam(MissingServletRequestParameterException ex) {
         String message = String.format("Missing required parameter: %s", ex.getParameterName());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.failure(HttpStatus.BAD_REQUEST, message));
+        return ResponseBuilder.failure(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -55,13 +46,11 @@ public class GlobalExceptionHandler {
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .findFirst()
                 .orElse("Validation failed");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.failure(HttpStatus.BAD_REQUEST, message));
+        return ResponseBuilder.failure(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.failure(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred."));
+        return ResponseBuilder.failure(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.");
     }
 }

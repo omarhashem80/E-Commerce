@@ -4,6 +4,8 @@ import com.ecommerce.shop.entities.CartItem;
 import com.ecommerce.shop.entities.Order;
 import com.ecommerce.shop.entities.OrderItem;
 import com.ecommerce.shop.entities.Status;
+import com.ecommerce.shop.exceptions.InvalidOperationException;
+import com.ecommerce.shop.exceptions.NotFoundException;
 import com.ecommerce.shop.repositories.CartItemRepository;
 import com.ecommerce.shop.repositories.OrderItemRepository;
 import com.ecommerce.shop.repositories.OrderRepository;
@@ -28,8 +30,8 @@ public class OrderService {
 
     public Order getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId).orElse(null);
-        if (order == null || order.isActive() == false) {
-            throw new RuntimeException("Order not found");
+        if (order == null || !order.isActive()) {
+            throw new NotFoundException("Order with id: " + orderId + " not found");
         }
         return order;
     }
@@ -37,7 +39,7 @@ public class OrderService {
     public Order createOrder(Long userId) {
         List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new InvalidOperationException("Cart of user wit id: " + userId + " is empty");
         }
 
         BigDecimal totalPrice = cartItems.stream()
@@ -95,14 +97,15 @@ public class OrderService {
 
     }
 
-    public OrderItem getOrderItemById(Long orderId, Long itemId){
+    public OrderItem getOrderItemById(Long orderId, Long itemId) {
         OrderItem item = orderItemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Order item not found"));
-        if (!item.getOrder().getOrderId().equals(orderId) || item.getOrder().isActive() == false) {
-            throw new RuntimeException("Order item not found");
+                .orElseThrow(() -> new NotFoundException("Order with id: " + orderId + " not found"));
+        if (!item.getOrder().getOrderId().equals(orderId) || !item.getOrder().isActive()) {
+            throw new NotFoundException("Order item with id: " + orderId + " not found");
         }
         return item;
     }
+
     public OrderItem updateQuantity(Long orderId, Long itemId, Integer quantity) {
         OrderItem item = getOrderItemById(orderId, itemId);
         item.setQuantity(quantity);
