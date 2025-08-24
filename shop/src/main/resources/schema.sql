@@ -25,7 +25,7 @@ CREATE TABLE order_items
     order_item_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id      BIGINT NOT NULL,
     product_id    BIGINT NOT NULL,
-    supplier_id   BIGINT NOT NULL,
+--     supplier_id   BIGINT NOT NULL,
     quantity      INT NOT NULL,
     price         DECIMAL(15, 2) NOT NULL,
     CONSTRAINT fk_order_item_order FOREIGN KEY (order_id) REFERENCES orders(order_id)

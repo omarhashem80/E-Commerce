@@ -22,20 +22,38 @@ VALUES
 -- ---------------------------------------------
 -- Seed Order Items
 -- ---------------------------------------------
+-- -- Order 1 (user 1)
+-- INSERT INTO order_items (order_id, product_id, supplier_id, quantity, price)
+-- VALUES
+--     (1, 1, 1, 2, 1500.00),  -- Laptop
+--     (1, 2, 1, 800.00);   -- Smartphone
+--
+-- -- Order 2 (user 2)
+-- INSERT INTO order_items (order_id, product_id, supplier_id, quantity, price)
+-- VALUES
+--     (2, 1, 1, 1, 1500.00),  -- Laptop
+--     (2, 3, 3, 4, 200.00);   -- Headphones
+--
+-- -- Order 3 (user 3)
+-- INSERT INTO order_items (order_id, product_id, supplier_id, quantity, price)
+-- VALUES
+--     (3, 4, 1, 3, 120.00),   -- Keyboard
+--     (3, 5, 4, 2, 50.00);    -- Mouse
+
 -- Order 1 (user 1)
-INSERT INTO order_items (order_id, product_id, supplier_id, quantity, price)
+INSERT INTO order_items (order_id, product_id, quantity, price)
 VALUES
-    (1, 1, 1, 2, 1500.00),  -- Laptop
-    (1, 2, 2, 1, 800.00);   -- Smartphone
+    (1, 1, 2, 1500.00),  -- Laptop
+    (1, 2, 1, 800.00);   -- Smartphone
 
 -- Order 2 (user 2)
-INSERT INTO order_items (order_id, product_id, supplier_id, quantity, price)
+INSERT INTO order_items (order_id, product_id, quantity, price)
 VALUES
-    (2, 1, 1, 1, 1500.00),  -- Laptop
-    (2, 3, 3, 4, 200.00);   -- Headphones
+    (2, 1, 1, 1500.00),  -- Laptop
+    (2, 3, 4, 200.00);   -- Headphones
 
 -- Order 3 (user 3)
-INSERT INTO order_items (order_id, product_id, supplier_id, quantity, price)
+INSERT INTO order_items (order_id, product_id, quantity, price)
 VALUES
-    (3, 4, 1, 3, 120.00),   -- Keyboard
-    (3, 5, 4, 2, 50.00);    -- Mouse
+    (3, 4, 3, 120.00),   -- Keyboard
+    (3, 5, 2, 50.00);    -- Mouse

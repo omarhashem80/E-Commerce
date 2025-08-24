@@ -5,6 +5,7 @@ import com.ecommerce.shop.dtos.TransactionDTO;
 import com.ecommerce.shop.dtos.TransactionType;
 import com.ecommerce.shop.entities.Order;
 import com.ecommerce.shop.entities.OrderItem;
+import com.ecommerce.shop.entities.Status;
 import com.ecommerce.shop.proxies.ProductProxy;
 import com.ecommerce.shop.proxies.WalletProxy;
 import lombok.AllArgsConstructor;
@@ -31,11 +32,12 @@ public class OrderOrchestrationServiceImpl implements OrderOrchestrationService 
 
         walletProxy.makeTransaction(userId, new TransactionDTO(amount, TransactionType.WITHDRAWAL));
 
+
         for (OrderItem item : orderItems) {
             productProxy.sell(item.getProductId(), new QuantityRequest(item.getQuantity()));
-            walletProxy.makeTransaction(item.getSupplierId(), new TransactionDTO(item.getPrice(), TransactionType.DEPOSIT));
         }
-
+        order.setStatus(Status.PAID);
+        orderService.updateOrderStatus(order.getOrderId(), order.getStatus());
         return order;
     }
 }

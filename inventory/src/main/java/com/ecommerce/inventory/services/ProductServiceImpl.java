@@ -120,6 +120,7 @@ public class ProductServiceImpl implements ProductService{
 
             stockLevelRepository.save(stockLevel);
         }
+
         return product;
     }
 }

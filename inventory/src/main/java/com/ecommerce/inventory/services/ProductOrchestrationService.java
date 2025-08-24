@@ -1,4 +1,7 @@
 package com.ecommerce.inventory.services;
 
-public class ProductOrchestrationService {
+import com.ecommerce.inventory.entities.Product;
+
+public interface ProductOrchestrationService {
+    Product handlePayments(Long productId, Integer quantity);
 }

@@ -4,6 +4,7 @@ import com.ecommerce.inventory.dtos.ProductDTO;
 import com.ecommerce.inventory.dtos.QuantityRequest;
 import com.ecommerce.inventory.entities.Product;
 import com.ecommerce.inventory.payloads.ApiResponse;
+import com.ecommerce.inventory.services.ProductOrchestrationService;
 import com.ecommerce.inventory.services.ProductService;
 import com.ecommerce.inventory.utils.ResponseBuilder;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ import java.util.List;
 
 public class ProductController {
     private final ProductService productService;
+    private final ProductOrchestrationService productOrchestrationService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Product>>> getProducts() {
@@ -91,7 +93,7 @@ public class ProductController {
     public ResponseEntity<ApiResponse<Product>> sell(
             @PathVariable Long productId,
             @RequestBody @Valid QuantityRequest quantity) {
-        Product soldProduct = productService.sellQuantity(productId, quantity.getQuantity());
+        Product soldProduct = productOrchestrationService.handlePayments(productId, quantity.getQuantity());
         return ResponseBuilder.build(
                 HttpStatus.OK,
                 "Quantity sold successfully",

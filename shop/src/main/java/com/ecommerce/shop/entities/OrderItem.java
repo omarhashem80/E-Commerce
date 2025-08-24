@@ -30,5 +30,4 @@ public class OrderItem {
 
     private BigDecimal price;
 
-    private Long supplierId;
 }

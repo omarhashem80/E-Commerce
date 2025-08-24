@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.PostMapping;
 @FeignClient(name = "wallet")
 public interface WalletProxy {
     @PostMapping("wallet/wallets/{userId}/transactions")
-    void withdrawal(@PathVariable Long userId, TransactionDTO transactionDTO);
+    void makeTransaction(@PathVariable Long userId, TransactionDTO transactionDTO);
 }
