@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(
         name = "stock_levels",
@@ -40,4 +42,6 @@ public class StockLevel {
     @JsonIgnore
     @Column(nullable = false)
     private Boolean active = true;
+
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

@@ -20,4 +20,6 @@ public interface ProductService {
     Product reserveQuantity(Long productId, Integer quantity);
 
     Product sellQuantity(Long productId, Integer quantity);
+
+    Product stockReturn(Long productId, Integer quantity);
 }

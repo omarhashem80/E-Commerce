@@ -101,5 +101,16 @@ public class ProductController {
         );
     }
 
+    @PostMapping("/{productId}/stock")
+    public ResponseEntity<ApiResponse<Product>> stockReturn(
+            @PathVariable Long productId,
+            @RequestBody @Valid QuantityRequest quantity) {
+        Product productToReturn = productService.stockReturn(productId, quantity.getQuantity());
+        return ResponseBuilder.build(
+                HttpStatus.OK,
+                "Quantity returned successfully",
+                productToReturn
+        );
+    }
 
 }

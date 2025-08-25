@@ -40,7 +40,7 @@ public class StockLevelServiceImpl implements StockLevelService {
     private StockLevel retrieveStockLevel(Long stockLevelId) {
         StockLevel stockLevel = stockLevelRepository.findById(stockLevelId).orElse(null);
         if (stockLevel == null || stockLevel.getActive() == false) {
-            throw new StockLevelNotFoundException(stockLevelId);
+            throw new NotFoundException("Stock level with id " + stockLevelId + " not found");
         }
         return stockLevel;
     }
@@ -51,7 +51,7 @@ public class StockLevelServiceImpl implements StockLevelService {
         Product product = productRepository.findById(productId).orElse(null);
 
         if (product == null || product.getActive() == false) {
-            throw new ProductNotFoundException(productId);
+            throw new NotFoundException("Product with id: " + productId + " not found");
         }
 
         Long warehouseId = stockLevelDTO.getWarehouseDTO().getWarehouseId();
@@ -59,7 +59,7 @@ public class StockLevelServiceImpl implements StockLevelService {
                 .orElse(null);
 
         if (warehouse == null || warehouse.getActive() == false) {
-            throw new WarehouseNotFoundException(warehouseId);
+            throw new NotFoundException("Warehouse with id " + warehouseId + " not found");
         }
 
         StockLevel checked = stockLevelRepository.getByProductProductIdAndWarehouseWarehouseId(productId, warehouse.getWarehouseId()).orElse(null);
@@ -118,7 +118,7 @@ public class StockLevelServiceImpl implements StockLevelService {
         StockLevel sourceStockLevel = stockLevelRepository.findByProductProductIdAndWarehouseAddress(productId, sourceAddress).orElse(null);
 
         if (sourceStockLevel == null || sourceStockLevel.getActive() == false) {
-            throw new StockLevelNotFoundException("Source stock level for product " + productId +
+            throw new NotFoundException("Source stock level for product " + productId +
                     " in warehouse " + sourceAddress + " not found");
         }
 
@@ -129,7 +129,7 @@ public class StockLevelServiceImpl implements StockLevelService {
         StockLevel destinationStockLevel = stockLevelRepository.findByProductProductIdAndWarehouseAddress(productId, destinationAddress).orElse(null);
 
         if (destinationStockLevel == null || destinationStockLevel.getActive() == false) {
-            throw new StockLevelNotFoundException("Destination stock level for product " + productId +
+            throw new NotFoundException("Destination stock level for product " + productId +
                     " in warehouse " + destinationAddress + " not found");
         }
 

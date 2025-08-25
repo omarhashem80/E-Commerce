@@ -4,18 +4,20 @@ import com.ecommerce.inventory.dtos.ProductDTO;
 import com.ecommerce.inventory.entities.Product;
 import com.ecommerce.inventory.entities.StockLevel;
 import com.ecommerce.inventory.exceptions.InvalidOperationException;
-import com.ecommerce.inventory.exceptions.ProductNotFoundException;
+import com.ecommerce.inventory.exceptions.NotFoundException;
 import com.ecommerce.inventory.repositories.ProductRepository;
 import com.ecommerce.inventory.repositories.StockLevelRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class ProductServiceImpl implements ProductService{
+@Transactional
+public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final StockLevelRepository stockLevelRepository;
 
@@ -23,11 +25,9 @@ public class ProductServiceImpl implements ProductService{
     public List<Product> getProducts() {
         return productRepository.findAll().stream()
                 .filter(product -> Boolean.TRUE.equals(product.getActive()))
-                .peek(product -> product.setStockLevels(
-                        product.getStockLevels().stream()
-                                .filter(inventory -> Boolean.TRUE.equals(inventory.getActive()))
-                                .toList()
-                ))
+                .peek(product -> {
+                    product.getStockLevels().removeIf(inventory -> !Boolean.TRUE.equals(inventory.getActive()));
+                })
                 .filter(product -> !product.getStockLevels().isEmpty())
                 .toList();
     }
@@ -36,7 +36,7 @@ public class ProductServiceImpl implements ProductService{
     public Product getProductById(Long productId) {
         Product product = productRepository.findById(productId).orElse(null);
         if (product == null || product.getActive() == false) {
-            throw new ProductNotFoundException(productId);
+            throw new NotFoundException("Product with id: " + productId + " not found");
         }
         return product;
     }
@@ -118,9 +118,30 @@ public class ProductServiceImpl implements ProductService{
             remainingQuantity -= toReserve;
             stockLevel.setQuantitySold(stockLevel.getQuantitySold() + toReserve);
 
-            stockLevelRepository.save(stockLevel);
         }
+        Product saved = productRepository.save(product);
+        return saved;
+    }
 
-        return product;
+    @Override
+    public Product stockReturn(Long productId, Integer quantity) {
+        Product product = getProductById(productId);
+        List<StockLevel> stockLevels = product.getStockLevels();
+        stockLevels.sort((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()));
+        Integer remainingQuantity = quantity;
+        for (StockLevel stockLevel : stockLevels) {
+            if (remainingQuantity < 1) break;
+            Integer soldQuantity = stockLevel.getQuantitySold();
+            if (soldQuantity > 0) {
+                Integer toReturn = Math.min(soldQuantity, remainingQuantity);
+
+                stockLevel.setQuantitySold(soldQuantity - toReturn);
+                stockLevel.setQuantityAvailable(stockLevel.getQuantityAvailable() + toReturn);
+                remainingQuantity -= toReturn;
+            }
+        }
+        Product saved = productRepository.save(product);
+
+        return saved;
     }
 }

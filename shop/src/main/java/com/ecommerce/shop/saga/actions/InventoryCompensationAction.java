@@ -1,5 +1,6 @@
 package com.ecommerce.shop.saga.actions;
 
+import com.ecommerce.shop.dtos.QuantityRequest;
 import com.ecommerce.shop.proxies.ProductProxy;
 import lombok.AllArgsConstructor;
 
@@ -11,6 +12,6 @@ public class InventoryCompensationAction implements CompensationAction {
 
     @Override
     public void compensate() {
-//        productProxy.addStock(productId, new QuantityRequest(quantity));
+        productProxy.stockReturn(productId, new QuantityRequest(quantity));
     }
 }

@@ -2,6 +2,7 @@ package com.ecommerce.inventory.exceptions;
 
 import com.ecommerce.inventory.utils.ResponseBuilder;
 import com.ecommerce.inventory.payloads.ApiResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +13,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @Value("${spring.profiles.active:prod}")
+    private String activeProfile;
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNotFoundException(NotFoundException ex) {
@@ -56,6 +59,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
-        return ResponseBuilder.failure(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.");
+        String message;
+
+        if ("dev".equalsIgnoreCase(activeProfile)) {
+            message = ex.getMessage();
+        } else {
+            message = "An unexpected error occurred.";
+        }
+        return ResponseBuilder.failure(HttpStatus.INTERNAL_SERVER_ERROR, message);
     }
 }

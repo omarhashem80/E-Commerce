@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
+
 @Service
 @AllArgsConstructor
 public class ProductOrchestrationServiceImpl implements ProductOrchestrationService {
@@ -15,6 +16,5 @@ public class ProductOrchestrationServiceImpl implements ProductOrchestrationServ
         Product product = productService.sellQuantity(productId, quantity);
         return product;
     }
-
 
 }

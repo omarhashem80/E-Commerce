@@ -13,6 +13,8 @@ import com.ecommerce.shop.saga.actions.InventoryCompensationAction;
 import com.ecommerce.shop.saga.actions.WalletCompensationAction;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,44 +27,64 @@ public class OrderOrchestrationServiceImpl implements OrderOrchestrationService 
     private final WalletProxy walletProxy;
     private final ProductProxy productProxy;
     private final SagaContext sagaContext;
+    private final Logger logger = LoggerFactory.getLogger(OrderOrchestrationServiceImpl.class);
 
     @Override
     public Order createOrderWithPayments(Long userId) {
         Order order = orderService.createOrder(userId);
         List<OrderItem> orderItems = order.getOrderItems();
 
-//        BigDecimal amount = orderItems.stream()
-//                .map(OrderItem::getPrice)
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        try {
+            for (OrderItem item : orderItems) {
+                boolean inventoryReduced = reduceInventory(item.getProductId(), item.getQuantity());
+                boolean walletWithdrawn = withdrawFromWallet(userId, item.getSupplierId(), item.getPrice());
 
-        for (OrderItem item : orderItems) {
-            reduceInventory(item.getProductId(), item.getQuantity());
-            withdrawFromWallet(userId, item.getSupplierId(), item.getPrice());
+                if (!inventoryReduced || !walletWithdrawn) {
+                    logger.warn("Order processing failed, triggering saga rollback");
+                    sagaContext.rollback();
+                    order.setStatus(Status.CANCELLED);
+                    orderService.updateOrderStatus(order.getOrderId(), order.getStatus());
+                    return order;
+                }
+            }
+
+            order.setStatus(Status.PAID);
+            orderService.updateOrderStatus(order.getOrderId(), order.getStatus());
+            sagaContext.clear();
+            return order;
+
+        } catch (Exception e) {
+            logger.error("Unexpected error during order processing", e);
+            sagaContext.rollback();
+            order.setStatus(Status.CANCELLED);
+            orderService.updateOrderStatus(order.getOrderId(), order.getStatus());
+            throw new ServiceNotFoundException("Order processing failed due to service unavailability");
         }
-
-        order.setStatus(Status.PAID);
-        orderService.updateOrderStatus(order.getOrderId(), order.getStatus());
-        return order;
     }
 
     @CircuitBreaker(name = "walletService", fallbackMethod = "walletFallback")
-    public void withdrawFromWallet(Long userId, Long receiverId, BigDecimal amount) {
-        walletProxy.transferMoney(userId, receiverId, new TransferDTO(amount));
-        sagaContext.addCompensation(new WalletCompensationAction(walletProxy, userId, receiverId, amount));
+    public boolean withdrawFromWallet(Long senderId, Long receiverId, BigDecimal amount) {
+        walletProxy.transferMoney(senderId, receiverId, new TransferDTO(amount));
+        sagaContext.addCompensation(new WalletCompensationAction(walletProxy, senderId, receiverId, amount));
+        return true;
     }
 
     @CircuitBreaker(name = "inventoryService", fallbackMethod = "inventoryFallback")
-    public void reduceInventory(Long productId, Integer quantity) {
+    public boolean reduceInventory(Long productId, Integer quantity) {
         productProxy.sell(productId, new QuantityRequest(quantity));
         sagaContext.addCompensation(new InventoryCompensationAction(productProxy, productId, quantity));
+        return true;
     }
 
-    public void walletFallback(Long userId, BigDecimal amount, Throwable t) {
-        throw new ServiceNotFoundException("Wallet service unavailable, transaction aborted");
+    public boolean walletFallback(Long senderId, Long receiverId, BigDecimal amount, Throwable t) {
+        logger.warn("Wallet service unavailable for transfer from {} to {} amount {}: {}",
+                senderId, receiverId, amount, t.getMessage());
+        return false;
     }
 
-    public void inventoryFallback(Long productId, Integer quantity, Throwable t) {
-        throw new ServiceNotFoundException("Inventory service unavailable, transaction aborted");
+    public boolean inventoryFallback(Long productId, Integer quantity, Throwable t) {
+        logger.warn("Inventory service unavailable for product {} quantity {}: {}",
+                productId, quantity, t.getMessage());
+        return false;
     }
-
 }

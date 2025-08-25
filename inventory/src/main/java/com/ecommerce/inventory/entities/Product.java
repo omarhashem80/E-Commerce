@@ -48,4 +48,9 @@ public class Product {
         stockLevels.add(stockLevel);
         stockLevel.setProduct(this);
     }
+
+    public void removeStockLevel(StockLevel stockLevel) {
+        stockLevels.remove(stockLevel);
+        stockLevel.setProduct(null);
+    }
 }

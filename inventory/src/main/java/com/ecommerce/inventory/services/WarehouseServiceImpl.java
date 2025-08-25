@@ -4,15 +4,17 @@ package com.ecommerce.inventory.services;
 import com.ecommerce.inventory.dtos.WarehouseDTO;
 import com.ecommerce.inventory.entities.Warehouse;
 import com.ecommerce.inventory.exceptions.AlreadyExistsException;
-import com.ecommerce.inventory.exceptions.WarehouseNotFoundException;
+import com.ecommerce.inventory.exceptions.NotFoundException;
 import com.ecommerce.inventory.repositories.WarehouseRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class WarehouseServiceImpl implements WarehouseService{
     private final WarehouseRepository warehouseRepository;
 
@@ -26,7 +28,7 @@ public class WarehouseServiceImpl implements WarehouseService{
         Warehouse warehouse = warehouseRepository.findById(warehouseId).orElse(null);
 
         if (warehouse == null || warehouse.getActive() == false) {
-            throw new WarehouseNotFoundException(warehouseId);
+            throw new NotFoundException("Warehouse with id " + warehouseId + " not found");
         }
 
         return warehouse;
@@ -36,7 +38,7 @@ public class WarehouseServiceImpl implements WarehouseService{
     public Warehouse getWarehouseByAddress(String address) {
         Warehouse warehouse = warehouseRepository.findByAddress(address);
         if (warehouse == null || warehouse.getActive() == false) {
-            throw new WarehouseNotFoundException(address);
+            throw new NotFoundException("Warehouse with address " + address + " not found");
         }
         return warehouse;
     }

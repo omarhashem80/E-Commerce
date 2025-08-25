@@ -16,9 +16,11 @@ public interface ProductProxy {
     ResponseEntity<ApiResponse<List<Product>>> getProducts();
 
     @PostMapping("inventory/products/{productId}/reserve")
-    public ResponseEntity<ApiResponse<Product>> reserve(@PathVariable Long productId, @RequestBody QuantityRequest quantity);
+    ResponseEntity<ApiResponse<Product>> reserve(@PathVariable Long productId, @RequestBody QuantityRequest quantity);
 
     @PostMapping("inventory/products/{productId}/sell")
-    public ResponseEntity<ApiResponse<Product>> sell(@PathVariable Long productId, @RequestBody QuantityRequest quantity);
+    ResponseEntity<ApiResponse<Product>> sell(@PathVariable Long productId, @RequestBody QuantityRequest quantity);
 
+    @PostMapping("inventory/products/{productId}/stock")
+    void stockReturn(@PathVariable Long productId, QuantityRequest quantityRequest);
 }
