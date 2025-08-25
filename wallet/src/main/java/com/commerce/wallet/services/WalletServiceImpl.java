@@ -1,6 +1,7 @@
 package com.commerce.wallet.services;
 
 import com.commerce.wallet.dtos.TransactionDTO;
+import com.commerce.wallet.dtos.TransferDTO;
 import com.commerce.wallet.dtos.WalletDTO;
 import com.commerce.wallet.entities.TransactionType;
 import com.commerce.wallet.entities.User;
@@ -76,5 +77,13 @@ public class WalletServiceImpl implements WalletService{
         walletRepository.save(wallet);
 
         return wallet;
+    }
+
+    @Override
+    public Wallet transferMoney(Long senderId, Long receiverId, TransferDTO transferDTO) {
+        Wallet senderWallet = getWalletByUserId(senderId);
+        Wallet receiverWallet = getWalletByUserId(receiverId);
+        makeTransaction(senderId, new TransactionDTO(transferDTO.getAmount(), TransactionType.WITHDRAWAL));
+        return makeTransaction(receiverId, new TransactionDTO(transferDTO.getAmount(), TransactionType.DEPOSIT));
     }
 }

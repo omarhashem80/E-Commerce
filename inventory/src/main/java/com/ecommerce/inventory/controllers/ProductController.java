@@ -93,7 +93,7 @@ public class ProductController {
     public ResponseEntity<ApiResponse<Product>> sell(
             @PathVariable Long productId,
             @RequestBody @Valid QuantityRequest quantity) {
-        Product soldProduct = productOrchestrationService.handlePayments(productId, quantity.getQuantity());
+        Product soldProduct = productOrchestrationService.markSold(productId, quantity.getQuantity());
         return ResponseBuilder.build(
                 HttpStatus.OK,
                 "Quantity sold successfully",

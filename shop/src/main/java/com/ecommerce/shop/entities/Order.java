@@ -1,5 +1,6 @@
 package com.ecommerce.shop.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,6 +32,7 @@ public class Order {
     private Status status = Status.PENDING;
 
     @Column(nullable = false)
+    @JsonIgnore
     private boolean active = true;
 
     private LocalDateTime updatedAt = LocalDateTime.now();

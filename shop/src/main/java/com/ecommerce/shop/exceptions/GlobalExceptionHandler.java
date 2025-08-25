@@ -48,7 +48,10 @@ public class GlobalExceptionHandler {
                 .orElse("Validation failed");
         return ResponseBuilder.failure(HttpStatus.BAD_REQUEST, message);
     }
-
+    @ExceptionHandler(ServiceNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNotFoundException(ServiceNotFoundException ex) {
+        return ResponseBuilder.failure(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
         return ResponseBuilder.failure(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.");

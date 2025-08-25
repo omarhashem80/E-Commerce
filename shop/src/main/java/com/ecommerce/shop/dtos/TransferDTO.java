@@ -8,8 +8,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionDTO {
+public class TransferDTO {
     private BigDecimal amount;
-    private TransactionType type;
 }
 

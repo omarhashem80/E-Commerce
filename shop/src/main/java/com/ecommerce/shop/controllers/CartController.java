@@ -18,9 +18,7 @@ import java.util.List;
 @RequestMapping("/carts")
 @AllArgsConstructor
 public class CartController {
-
     private final CartService cartService;
-    private final ProductProxy productProxy;
 
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<List<CartItem>>> getCartItems(@PathVariable Long userId) {
@@ -31,10 +29,7 @@ public class CartController {
     @PostMapping("/{userId}")
     public ResponseEntity<ApiResponse<CartItem>> addCartItem(@PathVariable Long userId, @RequestBody CartItem cartItem) {
         // check if the user exists first but with auth no need to check it
-        ResponseEntity<ApiResponse<Product>> reserved = productProxy.reserve(
-                cartItem.getProductId(), new QuantityRequest(cartItem.getQuantity())
-        );
-        CartItem addedItem = cartService.addCartItem(userId, cartItem, reserved.getBody().getData());
+        CartItem addedItem = cartService.addCartItem(userId, cartItem);
         return ResponseBuilder.build(HttpStatus.CREATED, "Cart item added successfully", addedItem);
     }
 
@@ -44,8 +39,7 @@ public class CartController {
             @PathVariable Long cartItemId,
             @RequestBody CartItem updatedCartItem) {
 
-        productProxy.reserve(updatedCartItem.getProductId(), new QuantityRequest(updatedCartItem.getQuantity()));
-        CartItem updatedItem = cartService.updateCartItem(userId, cartItemId, updatedCartItem.getQuantity());
+        CartItem updatedItem = cartService.updateCartItem(userId, cartItemId, updatedCartItem);
         return ResponseBuilder.build(HttpStatus.OK, "Cart item updated successfully", updatedItem);
     }
 

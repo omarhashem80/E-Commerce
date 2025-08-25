@@ -30,4 +30,7 @@ public class OrderItem {
 
     private BigDecimal price;
 
+    @Column(nullable = false)
+    private Long supplierId;
+
 }

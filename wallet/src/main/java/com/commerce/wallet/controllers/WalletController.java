@@ -1,6 +1,7 @@
 package com.commerce.wallet.controllers;
 
 import com.commerce.wallet.dtos.TransactionDTO;
+import com.commerce.wallet.dtos.TransferDTO;
 import com.commerce.wallet.dtos.WalletDTO;
 import com.commerce.wallet.entities.Wallet;
 import com.commerce.wallet.entities.WalletTransaction;
@@ -20,24 +21,27 @@ import java.util.List;
 public class WalletController {
     private final WalletService walletService;
 
-    // get wallet
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<WalletDTO>> getWalletById(@PathVariable Long userId) {
         WalletDTO walletDTO = walletService.getWalletByUserIdDTO(userId);
         return ResponseBuilder.build(HttpStatus.OK, "Wallet retrieved successfully", walletDTO);
     }
 
-    // get wallet transactions
     @GetMapping("/{userId}/transactions")
     public ResponseEntity<ApiResponse<List<WalletTransaction>>> getWalletTransactionsById(@PathVariable Long userId) {
         List<WalletTransaction> walletTransactions = walletService.getWalletTransactionsById(userId);
         return ResponseBuilder.build(HttpStatus.OK, "Wallet transactions retrieved successfully", walletTransactions);
     }
 
-    // add money to the wallet
     @PostMapping("{userId}/transactions")
     public ResponseEntity<ApiResponse<Wallet>> makeTransaction(@PathVariable Long userId, @RequestBody TransactionDTO transactionDTO) {
         Wallet wallet = walletService.makeTransaction(userId, transactionDTO);
+        return ResponseBuilder.build(HttpStatus.CREATED, "Transaction created successfully", wallet);
+    }
+
+    @PostMapping("{senderId}/transactions/{receiverId}")
+    public ResponseEntity<ApiResponse<Wallet>> transferMoney(@PathVariable Long senderId, @PathVariable Long receiverId ,@RequestBody TransferDTO transferDTO) {
+        Wallet wallet = walletService.transferMoney(senderId, receiverId, transferDTO);
         return ResponseBuilder.build(HttpStatus.CREATED, "Transaction created successfully", wallet);
     }
 }

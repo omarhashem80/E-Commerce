@@ -22,4 +22,7 @@ public class CartItem {
     private Integer quantity;
 
     private BigDecimal price;
+
+    @Column(nullable = false)
+    private Long supplierId;
 }
