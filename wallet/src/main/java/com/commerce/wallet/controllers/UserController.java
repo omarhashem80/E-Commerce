@@ -1,44 +1,49 @@
 package com.commerce.wallet.controllers;
 
 import com.commerce.wallet.entities.User;
+import com.commerce.wallet.payloads.ApiResponse;
 import com.commerce.wallet.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.commerce.wallet.utils.ResponseBuilder;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@AllArgsConstructor
 public class UserController {
     private final UserService userService;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    // get all users
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+//    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
+        List<User> allUsers = userService.getAllUsers();
+        return ResponseBuilder.build(HttpStatus.OK, "Users retrieved successfully", allUsers);
     }
 
-    // get user by id
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    @GetMapping("/{userId}")
+//    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isSelf(authentication, #userId)")
+    public ResponseEntity<ApiResponse<User>> getUserById(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        return ResponseBuilder.build(HttpStatus.OK, "User retrieved successfully", user);
     }
 
-    // update user
-    @PatchMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.updateUser(id, user);
+    @PatchMapping("/{userId}")
+//    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isSelf(authentication, #userId)")
+    public ResponseEntity<ApiResponse<User>> updateUser(@PathVariable Long userId, @RequestBody User user) {
+        User updatedUser = userService.updateUser(userId, user);
+        return ResponseBuilder.build(HttpStatus.OK, "User updated successfully", updatedUser);
     }
 
-    // delete user
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    @DeleteMapping("/{userId}")
+//    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isSelf(authentication, #userId)")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ResponseBuilder.build(HttpStatus.OK, "User deleted successfully", null);
     }
 
 }

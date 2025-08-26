@@ -1,3 +1,5 @@
+-- create database inventorydb;
+-- use inventorydb;
 CREATE TABLE products
 (
     product_id  BIGINT AUTO_INCREMENT PRIMARY KEY,

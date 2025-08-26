@@ -1,4 +1,6 @@
 -- Cart items table
+-- Create database shopdb;
+-- use shopdb;
 CREATE TABLE cart_items
 (
     cart_item_id BIGINT AUTO_INCREMENT PRIMARY KEY,

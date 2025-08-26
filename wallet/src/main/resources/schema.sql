@@ -1,13 +1,21 @@
-DROP TABLE IF EXISTS wallet_transactions;
-DROP TABLE IF EXISTS wallets;
-DROP TABLE IF EXISTS users;
+-- SET REFERENTIAL_INTEGRITY FALSE;
+
+-- DROP TABLE IF EXISTS wallet_transactions;
+-- DROP TABLusersE IF EXISTS wallets;
+-- DROP TABLE IF EXISTS users;
+
+-- SET REFERENTIAL_INTEGRITY TRUE;
+
+-- CREATE DATABASE IF NOT EXISTS walletdb;
+-- CREATE DATABASE walletdb;
+-- USE walletdb;
 
 -- 1. users table
 CREATE TABLE users
 (
     user_id             BIGINT AUTO_INCREMENT PRIMARY KEY,
     email               VARCHAR(255) UNIQUE NOT NULL,
-    username            VARCHAR(255) UNIQUE NOT NULL,
+    user_name            VARCHAR(255) UNIQUE NOT NULL,
     first_name          VARCHAR(100)        NOT NULL,
     last_name           VARCHAR(100)        NOT NULL,
     role                ENUM('CUSTOMER', 'ADMIN', 'SUPPLIER') NOT NULL,

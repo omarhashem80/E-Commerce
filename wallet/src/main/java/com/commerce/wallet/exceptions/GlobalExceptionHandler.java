@@ -13,6 +13,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUsernameException(AlreadyExistsException ex) {
+        return ResponseBuilder.build(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
+    }
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNotFoundException(NotFoundException ex) {
         return ResponseBuilder.failure(HttpStatus.NOT_FOUND, ex.getMessage());
