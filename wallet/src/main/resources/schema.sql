@@ -15,7 +15,7 @@ CREATE TABLE users
 (
     user_id             BIGINT AUTO_INCREMENT PRIMARY KEY,
     email               VARCHAR(255) UNIQUE NOT NULL,
-    user_name            VARCHAR(255) UNIQUE NOT NULL,
+    user_name           VARCHAR(255) UNIQUE NOT NULL,
     first_name          VARCHAR(100)        NOT NULL,
     last_name           VARCHAR(100)        NOT NULL,
     role                ENUM('CUSTOMER', 'ADMIN', 'SUPPLIER') NOT NULL,
@@ -49,3 +49,16 @@ CREATE TABLE wallet_transactions
     CONSTRAINT fk_transactions_wallet FOREIGN KEY (wallet_id) REFERENCES wallets (wallet_id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE password_reset_tokens
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token      VARCHAR(255) NOT NULL UNIQUE,
+    expiration DATETIME     NOT NULL,
+    user_id    BIGINT       NOT NULL,
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (user_id)
+            ON DELETE CASCADE
+);
+
