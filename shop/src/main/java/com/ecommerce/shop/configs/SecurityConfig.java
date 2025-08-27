@@ -1,6 +1,6 @@
 package com.ecommerce.shop.configs;
 
-import com.ecommerce.shop.utils.JwtCookieFilter;
+import com.ecommerce.shop.filters.JwtCookieFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;

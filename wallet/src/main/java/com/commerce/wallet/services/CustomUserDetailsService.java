@@ -1,4 +1,4 @@
-package com.commerce.wallet.configs;
+package com.commerce.wallet.services;
 
 
 import com.commerce.wallet.entities.User;

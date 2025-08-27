@@ -1,5 +1,6 @@
 package com.ecommerce.inventory.configs;
 
+import com.ecommerce.inventory.filters.JwtCookieFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

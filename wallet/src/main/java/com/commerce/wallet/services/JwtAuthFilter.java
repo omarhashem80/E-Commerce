@@ -1,7 +1,6 @@
 package com.commerce.wallet.services;
 
 
-import com.commerce.wallet.configs.CustomUserDetailsService;
 import com.commerce.wallet.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

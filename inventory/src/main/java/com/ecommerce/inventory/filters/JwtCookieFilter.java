@@ -1,4 +1,4 @@
-package com.ecommerce.inventory.configs;
+package com.ecommerce.inventory.filters;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
