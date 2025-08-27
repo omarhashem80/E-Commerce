@@ -67,6 +67,11 @@ public class StockLevelServiceImpl implements StockLevelService {
         if (checked != null && checked.getActive()) {
             throw new AlreadyExistsException("Stock level already exists for product " + productId +
                     " in warehouse " + warehouse.getWarehouseId());
+        } else if (checked != null && !checked.getActive()) {
+            checked.setActive(true);
+            checked.setQuantityAvailable(stockLevelDTO.getQuantityAvailable());
+            StockLevel saved = stockLevelRepository.save(checked);
+            return StockLevelDTO.fromEntity(saved);
         }
 
         StockLevel stockLevel = stockLevelDTO.toEntity(product, warehouse);

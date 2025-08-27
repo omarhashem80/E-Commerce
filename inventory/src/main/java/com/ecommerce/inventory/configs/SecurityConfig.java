@@ -22,7 +22,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtCookieFilter,
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/warehouses/**").hasRole("ADMIN")
+                        .requestMatchers("/warehouses/**").hasAnyRole("ADMIN", "SUPPLIER")
                         .requestMatchers("/products/**").permitAll()
                         .requestMatchers("/stock-levels/**").hasAnyRole("ADMIN", "SUPPLIER")
                         .anyRequest().authenticated()

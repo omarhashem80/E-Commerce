@@ -24,7 +24,6 @@ public class SecurityConfig {
                 .addFilterBefore(jwtCookieFilter,
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/internal").permitAll()
                         .requestMatchers("/carts/**").hasRole("CUSTOMER")
                         .requestMatchers("/orders/**").hasAnyRole("ADMIN", "CUSTOMER")
                         .requestMatchers("/products/**").permitAll()

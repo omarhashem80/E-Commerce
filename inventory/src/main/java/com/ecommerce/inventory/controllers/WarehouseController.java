@@ -41,6 +41,7 @@ public class WarehouseController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Warehouse>> addWarehouse(@RequestBody Warehouse warehouse) {
         Warehouse savedWarehouse = warehouseService.addWarehouse(warehouse);
         return ResponseBuilder.build(
@@ -51,6 +52,7 @@ public class WarehouseController {
     }
 
     @PatchMapping("/{warehouseId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Warehouse>> updateWarehouse(
             @PathVariable Long warehouseId,
             @RequestBody WarehouseDTO warehouseDTO) {
@@ -64,6 +66,7 @@ public class WarehouseController {
     }
 
     @DeleteMapping("/{warehouseId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteWarehouse(@PathVariable Long warehouseId) {
         warehouseService.deleteWarehouse(warehouseId);
         return ResponseBuilder.build(
