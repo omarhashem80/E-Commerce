@@ -38,9 +38,11 @@ public class SecurityConfig {
 
                 // Authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-//                        .requestMatchers("/h2-console/**").permitAll()   // ✅ allow H2 console
-                        .anyRequest().authenticated()
+                                .requestMatchers("/auth/**").permitAll()
+//                        .requestMatchers("/h2-console/**").permitAll()
+                                .requestMatchers("/users/**", "/wallets/**").authenticated()
+
+                                .anyRequest().authenticated()
                 )
 
                 // Authentication provider

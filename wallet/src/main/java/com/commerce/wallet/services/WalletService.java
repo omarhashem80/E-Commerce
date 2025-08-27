@@ -17,4 +17,6 @@ public interface WalletService {
     Wallet makeTransaction(Long userId, TransactionDTO transactionDTO);
 
     Wallet transferMoney(Long senderId, Long receiverId, TransferDTO transferDTO);
+
+    boolean isOwner(Long userId, String email);
 }

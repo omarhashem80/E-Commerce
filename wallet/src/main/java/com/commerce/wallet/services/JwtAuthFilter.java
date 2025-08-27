@@ -48,25 +48,36 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = extractToken(request);
 
-        if (token != null && jwtUtil.isTokenValid(token, jwtUtil.extractUsername(token))) {
+        if (token != null) {
             String username = jwtUtil.extractUsername(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            if (username != null && jwtUtil.isTokenValid(token, username)
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+
+            filterChain.doFilter(request, response);
         }
-
-        filterChain.doFilter(request, response);
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-        return path.equals("/auth/signup") || path.equals("/auth/login") || path.equals("/auth/forgot-password") || path.equals("/auth/reset-password") || path.equals("/auth/me");
+        return path.startsWith("/auth/signup") ||
+                path.startsWith("/auth/login") ||
+                path.startsWith("/auth/forgot-password") ||
+                path.startsWith("/auth/reset-password") ||
+                path.startsWith("/auth/me");
     }
-
-
-
 
 }

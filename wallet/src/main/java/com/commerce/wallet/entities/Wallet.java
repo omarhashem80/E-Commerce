@@ -47,7 +47,6 @@ public class Wallet {
     public void addTransaction(WalletTransaction transaction) {
         transactions.add(transaction);
         transaction.setWallet(this);
-//        balance = balance.add(transaction.getAmount());
     }
 
     public void removeTransaction(WalletTransaction transaction) {

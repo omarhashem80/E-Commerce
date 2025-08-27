@@ -86,4 +86,10 @@ public class WalletServiceImpl implements WalletService{
         makeTransaction(senderId, new TransactionDTO(transferDTO.getAmount(), TransactionType.WITHDRAWAL));
         return makeTransaction(receiverId, new TransactionDTO(transferDTO.getAmount(), TransactionType.DEPOSIT));
     }
+
+    @Override
+    public boolean isOwner(Long userId, String email) {
+        Wallet wallet = getWalletByUserId(userId);
+        return wallet.getUser().getEmail().equals(email);
+    }
 }

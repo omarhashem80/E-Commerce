@@ -6,6 +6,7 @@ import com.commerce.wallet.dtos.SignupRequest;
 import com.commerce.wallet.dtos.UserDTO;
 import com.commerce.wallet.entities.PasswordResetToken;
 import com.commerce.wallet.entities.User;
+import com.commerce.wallet.entities.Wallet;
 import com.commerce.wallet.exceptions.AlreadyExistsException;
 import com.commerce.wallet.exceptions.InvalidOperationException;
 import com.commerce.wallet.exceptions.NotFoundException;
@@ -54,7 +55,7 @@ public class AuthService {
             throw new AlreadyExistsException("Username or email already exists");
         }
         //TODO: last step
-//        if(request.getRole().equals("ADMIN")) {
+//        if(request.getRole().equals(Role.ADMIN)) {
 //            throw new InvalidOperationException("Admin can't be created");
 //        }
 
@@ -69,8 +70,13 @@ public class AuthService {
                 .build();
 
         User saved = userRepository.save(user);
+        Wallet wallet = new Wallet();
+        wallet.setUser(saved);
+        saved.setWallet(wallet);
 
-        return saved;
+        User finalUser = userRepository.save(saved);
+        
+        return finalUser;
     }
 
     public void login(LoginRequest request, HttpServletResponse response) {

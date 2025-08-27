@@ -4,6 +4,7 @@ import com.commerce.wallet.payloads.ApiResponse;
 import com.commerce.wallet.utils.ResponseBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -13,6 +14,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AuthorizationDeniedException ex) {
+        return ResponseBuilder.failure(HttpStatus.FORBIDDEN, "Access Denied: You do not have permission to perform this action.");
+    }
 
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<ApiResponse<Void>> handleUserNameException(AlreadyExistsException ex) {
