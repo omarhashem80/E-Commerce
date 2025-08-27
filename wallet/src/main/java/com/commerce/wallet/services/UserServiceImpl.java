@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
-        if(user == null || !user.isActive())
+        if (user == null || !user.isActive())
             throw new NotFoundException("User with userId: " + userId + " not found");
         return user;
     }
@@ -32,24 +32,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(Long userId, User user) {
         User existingUser = getUserById(userId);
-        if(user.getEmail() != null){
+        if (user.getEmail() != null) {
             existingUser.setEmail(user.getEmail());
         }
-        if(user.getFirstName() != null){
+        if (user.getFirstName() != null) {
             existingUser.setFirstName(user.getFirstName());
         }
         if (user.getLastName() != null) {
             existingUser.setLastName(user.getLastName());
         }
         if (user.getUserName() != null) {
-            User checked = userRepository.findByUserName(user.getUserName()).orElse(null);
-            if(checked != null && !checked.getUserId().equals(existingUser.getUserId())) {
-                throw new InvalidOperationException("Username already exists");
-            }
-            existingUser.setUserName(user.getUserName());
+            throw new InvalidOperationException("Username is immutable");
         }
         if (user.getRole() != null) {
-            if(user.getRole().equals(Role.ADMIN) || existingUser.getRole().equals(Role.ADMIN)) {
+            if (user.getRole().equals(Role.ADMIN) || existingUser.getRole().equals(Role.ADMIN)) {
                 throw new InvalidOperationException("Admin can't be updated");
             }
             existingUser.setRole(user.getRole());
@@ -63,7 +59,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userId) {
         User existingUser = getUserById(userId);
-        if(existingUser.getRole().equals(Role.ADMIN)) {
+        if (existingUser.getRole().equals(Role.ADMIN)) {
             throw new InvalidOperationException("Admin can't be deleted");
         }
         existingUser.setActive(false);

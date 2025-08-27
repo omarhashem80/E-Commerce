@@ -1,5 +1,6 @@
 package com.ecommerce.shop.configs;
 
+import com.ecommerce.shop.utils.JwtCookieFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,8 +24,10 @@ public class SecurityConfig {
                 .addFilterBefore(jwtCookieFilter,
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/internal").permitAll()
                         .requestMatchers("/carts/**").hasRole("CUSTOMER")
-                        .requestMatchers("/products/**", "/stock-levels/**").hasAnyRole("ADMIN", "SUPPLIER")
+                        .requestMatchers("/orders/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers("/products/**").hasAnyRole("ADMIN", "SUPPLIER", "CUSTOMER")
                         .anyRequest().authenticated()
                 );
 

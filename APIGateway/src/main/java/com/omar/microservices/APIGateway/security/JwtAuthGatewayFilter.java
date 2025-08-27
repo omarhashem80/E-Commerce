@@ -2,7 +2,7 @@ package com.omar.microservices.APIGateway.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,10 +17,13 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 
 @Component
-@RequiredArgsConstructor
 public class JwtAuthGatewayFilter implements WebFilter {
 
-    private final String SECRET = "Zy7xP9qL2mT8bV6rY1sE3wK5dH0nF4jQ";
+    private final String SECRET;
+
+    public JwtAuthGatewayFilter(@Value("${app.jwt.secret}") String secret) {
+        this.SECRET = secret;
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {

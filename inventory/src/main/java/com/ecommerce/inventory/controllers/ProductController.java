@@ -25,7 +25,7 @@ public class ProductController {
     private final ProductOrchestrationService productOrchestrationService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','SUPPLIER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPPLIER', 'SERVICE')")
     public ResponseEntity<ApiResponse<List<Product>>> getProducts() {
         List<Product> products = productService.getProducts();
         return ResponseBuilder.build(

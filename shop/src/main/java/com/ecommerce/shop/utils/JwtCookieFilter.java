@@ -1,4 +1,4 @@
-package com.ecommerce.shop.configs;
+package com.ecommerce.shop.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +20,11 @@ import java.util.Collections;
 @Component
 public class JwtCookieFilter extends OncePerRequestFilter {
 
-    private final String SECRET = "Zy7xP9qL2mT8bV6rY1sE3wK5dH0nF4jQ";
+    private final String SECRET;
+
+    public JwtCookieFilter(@Value("${app.jwt.secret}") String secret) {
+        this.SECRET = secret;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -28,7 +33,6 @@ public class JwtCookieFilter extends OncePerRequestFilter {
 
         String token = null;
 
-        // 🔹 Extract JWT from cookie
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("jwt".equals(cookie.getName())) {

@@ -21,7 +21,6 @@ public class JwtUtil {
         this.expirationMs = expirationMs;
     }
 
-    // Generate JWT token
     public String generateToken(String userName, Long userId, Role role) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + expirationMs);

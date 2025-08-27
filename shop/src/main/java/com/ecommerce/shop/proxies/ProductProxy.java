@@ -1,5 +1,6 @@
 package com.ecommerce.shop.proxies;
 
+import com.ecommerce.shop.configs.FeignAuthConfig;
 import com.ecommerce.shop.dtos.QuantityRequest;
 import com.ecommerce.shop.entities.Product;
 import com.ecommerce.shop.payloads.ApiResponse;
@@ -9,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "inventory")
+@FeignClient(name = "inventory", configuration = FeignAuthConfig.class)
 public interface ProductProxy {
+
+    @GetMapping("inventory/internal")
+    String hello();
 
     @GetMapping("inventory/products")
     ResponseEntity<ApiResponse<List<Product>>> getProducts();

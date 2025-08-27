@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,8 +19,11 @@ import java.util.Collections;
 
 @Component
 public class JwtCookieFilter extends OncePerRequestFilter {
+    private final String SECRET;
 
-    private final String SECRET = "Zy7xP9qL2mT8bV6rY1sE3wK5dH0nF4jQ";
+    public JwtCookieFilter(@Value("${app.jwt.secret}") String secret) {
+        this.SECRET = secret;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
