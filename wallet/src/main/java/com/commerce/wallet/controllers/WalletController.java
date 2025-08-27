@@ -43,9 +43,7 @@ public class WalletController {
         return ResponseBuilder.build(HttpStatus.CREATED, "Transaction created successfully", wallet);
     }
 
-    //TODO: will issue an error in roll back logic(solution: add a rollback role)
     @PostMapping("{senderId}/transactions/{receiverId}")
-    @PreAuthorize("@userSecurity.isSelf(authentication, #senderId)")
     public ResponseEntity<ApiResponse<Wallet>> transferMoney(@PathVariable Long senderId, @PathVariable Long receiverId ,@RequestBody TransferDTO transferDTO) {
         Wallet wallet = walletService.transferMoney(senderId, receiverId, transferDTO);
         return ResponseBuilder.build(HttpStatus.CREATED, "Transaction created successfully", wallet);

@@ -22,7 +22,8 @@ public class SecurityConfig {
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/warehouses/**").hasRole("ADMIN")
-                        .requestMatchers("/products/**", "/stock-levels/**").hasAnyRole("ADMIN", "SUPPLIER")
+                        .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/stock-levels/**").hasAnyRole("ADMIN", "SUPPLIER")
                         .anyRequest().authenticated()
                 );
 
