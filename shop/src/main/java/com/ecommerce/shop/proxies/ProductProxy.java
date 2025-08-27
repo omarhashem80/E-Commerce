@@ -13,8 +13,6 @@ import java.util.List;
 @FeignClient(name = "inventory", configuration = FeignCookieForwardingConfig.class )
 public interface ProductProxy {
 
-    @GetMapping("inventory/internal")
-    String hello();
 
     @GetMapping("inventory/products")
     ResponseEntity<ApiResponse<List<Product>>> getProducts();

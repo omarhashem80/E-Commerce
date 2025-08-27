@@ -9,6 +9,7 @@ import com.ecommerce.shop.payloads.ApiResponse;
 import com.ecommerce.shop.proxies.ProductProxy;
 import com.ecommerce.shop.repositories.CartItemRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,29 +63,24 @@ public class CartServiceImpl implements CartService {
         throw new ServiceNotFoundException("Inventory service unavailable. Please try again later.");
     }
 
-    private CartItem updateCartItem(Long userId, Long cartItemId, Integer quantity) {
+    @Override
+    public CartItem updateCartItem(Long userId, Long cartItemId,CartItem updatedCartItem) {
         CartItem item = cartItemRepository.findByCartItemIdAndUserId(cartItemId, userId)
                 .orElseThrow(() -> new NotFoundException("Cart item with id: " + cartItemId + " not found"));
-        item.setQuantity(quantity);
-        return cartItemRepository.save(item);
-    }
+        item.setQuantity(updatedCartItem.getQuantity());
 
-    @Override
-    @CircuitBreaker(name = "cartItemService", fallbackMethod = "updateCartItemFallback")
-    public CartItem updateCartItem(Long userId, Long cartItemId, CartItem updatedCartItem) {
-        logger.info("Reserving product {} with quantity {}",
-                updatedCartItem.getProductId(), updatedCartItem.getQuantity());
-
-        productProxy.reserve(updatedCartItem.getProductId(),
-                new QuantityRequest(updatedCartItem.getQuantity()));
-
-        CartItem updatedItem = updateCartItem(userId, cartItemId, updatedCartItem.getQuantity());
-        logger.info("Cart item {} updated successfully for user {}", cartItemId, userId);
+        CartItem updatedItem =  cartItemRepository.save(item);
 
         return updatedItem;
     }
 
-    public CartItem updateCartItemFallback(Long userId, Long cartItemId, CartItem updatedCartItem, Throwable ex) {
+    @CircuitBreaker(name = "cartItemService", fallbackMethod = "updateCartItemFallback")
+    private void updateCartItem(Long userId, Long productId, Integer quantity) {
+        productProxy.reserve(productId,
+                new QuantityRequest(quantity));
+    }
+
+    public void updateCartItemFallback(Long userId, Long cartItemId, CartItem updatedCartItem, Throwable ex) {
         logger.error("CartItem update failed for user {} cartItem {}. Error: {}",
                 userId, cartItemId, ex.getMessage());
 
