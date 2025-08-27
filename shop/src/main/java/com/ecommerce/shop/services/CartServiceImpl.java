@@ -100,4 +100,12 @@ public class CartServiceImpl implements CartService {
     public void clearCart(Long userId) {
         cartItemRepository.deleteByUserId(userId);
     }
+
+    @Override
+    public Long getCartUserId(Long userId) {
+        return cartItemRepository.findByUserId(userId).stream()
+                .findFirst()
+                .map(CartItem::getUserId)
+                .orElse(null);
+    }
 }

@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class ProductController {
     private final ProductOrchestrationService productOrchestrationService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','SUPPLIER')")
     public ResponseEntity<ApiResponse<List<Product>>> getProducts() {
         List<Product> products = productService.getProducts();
         return ResponseBuilder.build(
@@ -34,6 +36,7 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
+    @PreAuthorize("hasRole('ADMIN') or @productSecurity.isOwner(authentication, #productId)")
     public ResponseEntity<ApiResponse<Product>> getProductById(@PathVariable Long productId) {
         Product product = productService.getProductById(productId);
         return ResponseBuilder.build(
@@ -44,6 +47,7 @@ public class ProductController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('SUPPLIER')")
     public ResponseEntity<ApiResponse<Product>> createProduct(@RequestBody ProductDTO productDTO) {
         Product createdProduct = productService.createProduct(productDTO);
         return ResponseBuilder.build(
@@ -54,6 +58,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{productId}")
+    @PreAuthorize("@productSecurity.isOwner(authentication, #productId)")
     public ResponseEntity<ApiResponse<Product>> updateProduct(
             @PathVariable Long productId,
             @RequestBody Product product) {
@@ -66,6 +71,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{productId}")
+    @PreAuthorize("@productSecurity.isOwner(authentication, #productId)")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
         return ResponseBuilder.build(
@@ -77,6 +83,7 @@ public class ProductController {
 
     // reserve
     @PostMapping("/{productId}/reserve")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<ApiResponse<Product>> reserve(
             @PathVariable Long productId,
             @RequestBody @Valid QuantityRequest quantity) {
@@ -90,6 +97,7 @@ public class ProductController {
 
     // sell
     @PostMapping("/{productId}/sell")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<ApiResponse<Product>> sell(
             @PathVariable Long productId,
             @RequestBody @Valid QuantityRequest quantity) {
@@ -102,6 +110,7 @@ public class ProductController {
     }
 
     @PostMapping("/{productId}/stock")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<ApiResponse<Product>> stockReturn(
             @PathVariable Long productId,
             @RequestBody @Valid QuantityRequest quantity) {

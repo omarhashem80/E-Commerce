@@ -150,4 +150,11 @@ public class StockLevelServiceImpl implements StockLevelService {
         return result;
     }
 
+    @Override
+    public Long getSupplierIdByStockLevel(Long stockLevelId) {
+        StockLevel stockLevel = retrieveStockLevel(stockLevelId);
+        Product product = stockLevel.getProduct();
+        return product.getSupplierId();
+    }
+
 }

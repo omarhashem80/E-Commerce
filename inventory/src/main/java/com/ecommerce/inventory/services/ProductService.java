@@ -22,4 +22,6 @@ public interface ProductService {
     Product sellQuantity(Long productId, Integer quantity);
 
     Product stockReturn(Long productId, Integer quantity);
+
+    Long getProductSupplierId(Long productId);
 }

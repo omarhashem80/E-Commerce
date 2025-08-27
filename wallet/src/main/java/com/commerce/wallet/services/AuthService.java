@@ -75,18 +75,20 @@ public class AuthService {
         saved.setWallet(wallet);
 
         User finalUser = userRepository.save(saved);
-        
+
         return finalUser;
     }
 
     public void login(LoginRequest request, HttpServletResponse response) {
+        String username = request.getUsername();
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(), request.getPassword())
+                        username, request.getPassword())
         );
 
+        User user = userRepository.findByUserName(username).orElse(null);
 
-        String token = jwtUtil.generateToken(request.getUsername());
+        String token = jwtUtil.generateToken(username, user.getUserId(), user.getRole());
         Cookie cookie = new Cookie("jwt", token);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
@@ -157,7 +159,7 @@ public class AuthService {
             throw new NotFoundException("User not found");
         }
 
-        UserDTO userDTO = UserDTO.builder()
+        return UserDTO.builder()
                 .id(user.getUserId())
                 .email(user.getEmail())
                 .userName(user.getUserName())
@@ -165,7 +167,6 @@ public class AuthService {
                 .lastName(user.getLastName())
                 .role(user.getRole())
                 .build();
-        return userDTO;
     }
 
     public void logout(HttpServletResponse response) {

@@ -8,6 +8,7 @@ import com.ecommerce.inventory.utils.ResponseBuilder;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class StockLevelController {
     private final StockLevelService stockLevelService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<StockLevelDTO>>> getAllStockLevels() {
         List<StockLevelDTO> stockLevels = stockLevelService.getAllStockLevels();
         return ResponseBuilder.build(
@@ -31,6 +33,7 @@ public class StockLevelController {
     }
 
     @GetMapping("/{stockLevelId}")
+    @PreAuthorize("hasRole('ADMIN') || @stockLevelSecurity.isOwner(authentication, #stockLevelId)")
     public ResponseEntity<ApiResponse<StockLevelDTO>> getStockLevel(@PathVariable Long stockLevelId) {
         StockLevelDTO stockLevel = stockLevelService.getStockLevel(stockLevelId);
         return ResponseBuilder.build(
@@ -41,6 +44,7 @@ public class StockLevelController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('SUPPLIER')")
     public ResponseEntity<ApiResponse<StockLevelDTO>> createStockLevel(@RequestBody StockLevelDTO stockLevelDTO) {
         StockLevelDTO created = stockLevelService.createStockLevel(stockLevelDTO);
         return ResponseBuilder.build(
@@ -51,6 +55,7 @@ public class StockLevelController {
     }
 
     @PatchMapping("/{stockLevelId}/quantity")
+    @PreAuthorize("@stockLevelSecurity.isOwner(authentication, #stockLevelId)")
     public ResponseEntity<ApiResponse<StockLevelDTO>> editQuantity(
             @PathVariable Long stockLevelId,
             @RequestBody QuantityRequest quantityRequest
@@ -64,6 +69,7 @@ public class StockLevelController {
     }
 
     @PatchMapping("/transfer/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Map<String, StockLevelDTO>>> transfer(
             @RequestParam String source,
             @PathVariable Long productId,
@@ -84,6 +90,7 @@ public class StockLevelController {
     }
 
     @DeleteMapping("/{stockLevelId}")
+    @PreAuthorize("@stockLevelSecurity.isOwner(authentication, #stockLevelId)")
     public ResponseEntity<ApiResponse<Void>> deleteStockLevel(@PathVariable Long stockLevelId) {
         stockLevelService.deleteStockLevel(stockLevelId);
         return ResponseBuilder.build(

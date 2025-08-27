@@ -17,4 +17,6 @@ public interface StockLevelService {
     void deleteStockLevel(Long stockLevelId);
 
     Map<String, StockLevelDTO> transferQuantity(String sourceAddress, Long productId, Integer quantity, String destinationAddress);
+
+    Long getSupplierIdByStockLevel(Long stockLevelId);
 }

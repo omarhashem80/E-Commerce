@@ -144,4 +144,11 @@ public class ProductServiceImpl implements ProductService {
 
         return saved;
     }
+
+    @Override
+    public Long getProductSupplierId(Long productId) {
+        Product product = getProductById(productId);
+        return product.getSupplierId();
+    }
+
 }
