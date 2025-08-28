@@ -28,18 +28,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF (JWT app, no sessions)
                 .csrf(csrf -> csrf.disable())
 
-                // Allow H2 console frames
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
 
-                // Stateless session management
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // Authorization rules
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/auth/**").permitAll()
 //                        .requestMatchers("/h2-console/**").permitAll()
@@ -48,10 +44,8 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
 
-                // Authentication provider
                 .authenticationProvider(authenticationProvider())
 
-                // Add JWT filter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

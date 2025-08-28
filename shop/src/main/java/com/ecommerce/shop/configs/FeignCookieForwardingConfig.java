@@ -25,7 +25,6 @@ public class FeignCookieForwardingConfig {
                 if (request.getCookies() != null) {
                     for (Cookie cookie : request.getCookies()) {
                         if ("jwt".equals(cookie.getName())) {
-                            // Forward as cookie (if downstream expects cookie-based auth)
                             template.header("Cookie", "jwt=" + cookie.getValue());
 
                             break;
