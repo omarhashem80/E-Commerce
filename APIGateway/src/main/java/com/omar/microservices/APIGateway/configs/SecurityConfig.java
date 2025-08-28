@@ -1,6 +1,6 @@
 package com.omar.microservices.APIGateway.configs;
 
-import com.omar.microservices.APIGateway.security.JwtAuthGatewayFilter;
+import com.omar.microservices.APIGateway.filters.JwtAuthGatewayFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .logout(ServerHttpSecurity.LogoutSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers("/wallet/auth/**").permitAll()
                         .anyExchange().authenticated()
                 )

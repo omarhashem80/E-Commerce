@@ -1,4 +1,4 @@
-package com.omar.microservices.APIGateway.security;
+package com.omar.microservices.APIGateway.filters;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -29,7 +29,7 @@ public class JwtAuthGatewayFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
-        if (path.startsWith("/wallet/auth/")) {
+        if (path.startsWith("/wallet/auth/") || path.startsWith("/actuator/")) {
             return chain.filter(exchange);
         }
 
@@ -84,4 +84,5 @@ public class JwtAuthGatewayFilter implements WebFilter {
         exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
         return exchange.getResponse().setComplete();
     }
+
 }
