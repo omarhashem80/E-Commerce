@@ -53,7 +53,6 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserDTO>> me(HttpServletRequest request) {
-        System.out.println("me");
         UserDTO me = authService.getMe(request);
         return ResponseBuilder.build(HttpStatus.OK, "Fetched current user", me);
     }
