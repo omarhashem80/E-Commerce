@@ -13,7 +13,7 @@ This system is designed to provide a **robust, scalable, and modular e-commerce 
 The platform offers a **secure and flexible authentication system**:
 
 * **JWT-based authentication** for all services 🔑
-* **User registration and login** (via API Gateway)
+* **User registration and login**
 * **Password reset** via email OTP 🔄
 * Secure routing and access management through **API Gateway**
 
@@ -85,17 +85,6 @@ The single entry point for all requests:
 * **Spring Boot Actuator** enabled for monitoring
 * **OpenFeign** for inter-service communication
 * **Caffeine caching** for fast reads
-
----
-
-## 🖥️ **Available Endpoints**
-
-* **Shop Service:** `/shop` (Products & Orders)
-* **Inventory Service:** `/inventory` (Stock Management)
-* **Wallet Service:** `/wallet` (User Wallet)
-* **API Gateway:** `/` (Routes to services)
-* **Config Server:** `/actuator` (Configuration & monitoring)
-* **Eureka Server:** `/` (Service registry)
 
 ---
 
