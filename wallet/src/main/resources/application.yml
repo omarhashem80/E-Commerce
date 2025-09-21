@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: wallet
+
+  main:
+    banner-mode: off
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/walletdb?useSSL=false&serverTimezone=UTC
+    username: springstudent
+    password: springstudent
+
+  jpa:
+    show-sql: true
+
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: omarfiddler100@gmail.com
+    password: xjcmwqovnsocbfpq
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 8200
+  servlet:
+    context-path: /wallet
+
+app:
+  jwt:
+    secret: Zy7xP9qL2mT8bV6rY1sE3wK5dH0nF4jQ
+    expiration-ms: 3600000
+
+  mail:
+    from: noreply@example.com
+
+  reset:
+    otp:
+      expiration-minutes: 15
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+  instance:
+    hostname: localhost
+    prefer-ip-address: false
+    ip-address: 127.0.0.1
+    non-secure-port: ${server.port}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

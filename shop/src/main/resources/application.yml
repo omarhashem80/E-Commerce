@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: shop
+
+  main:
+    banner-mode: off
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/shopdb?useSSL=false&serverTimezone=UTC
+    username: springstudent
+    password: springstudent
+
+  cache:
+    type: caffeine
+    cache-names: productsCache
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=1m
+
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  # profiles:
+  #   active: prod
+
+  # cloud:
+  #   openfeign:
+  #     circuitbreaker:
+  #       enabled: true
+
+server:
+  port: 8100
+  servlet:
+    context-path: /shop
+
+app:
+  jwt:
+    secret: Zy7xP9qL2mT8bV6rY1sE3wK5dH0nF4jQ
+  service:
+    jwt:
+      secret: Zy7xP9qL2mT8bV6rY1sE3wK5dH0nF4jQ
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+  instance:
+    hostname: localhost
+    prefer-ip-address: false
+    ip-address: 127.0.0.1
+    non-secure-port: ${server.port}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

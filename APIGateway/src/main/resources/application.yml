@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: APIGateway
+
+  main:
+    banner-mode: off
+
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  cloud:
+    loadbalancer:
+      cache:
+        enabled: true
+        ttl: 35s
+      health-check:
+        initial-delay: 0
+        interval: 25s
+
+server:
+  port: 8765
+
+app:
+  jwt:
+    secret: Zy7xP9qL2mT8bV6rY1sE3wK5dH0nF4jQ
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
