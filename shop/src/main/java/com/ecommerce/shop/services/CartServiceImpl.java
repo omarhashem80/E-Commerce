@@ -5,11 +5,10 @@ import com.ecommerce.shop.entities.CartItem;
 import com.ecommerce.shop.entities.Product;
 import com.ecommerce.shop.exceptions.NotFoundException;
 import com.ecommerce.shop.exceptions.ServiceNotFoundException;
-import com.ecommerce.shop.payloads.ApiResponse;
+import com.ecommerce.shop.payloads.ResponseTemplate;
 import com.ecommerce.shop.proxies.ProductProxy;
 import com.ecommerce.shop.repositories.CartItemRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +43,7 @@ public class CartServiceImpl implements CartService {
         logger.info("Attempting to reserve product {} with quantity {} for user {}",
                 cartItem.getProductId(), cartItem.getQuantity(), userId);
 
-        ResponseEntity<ApiResponse<Product>> reserved = productProxy.reserve(
+        ResponseEntity<ResponseTemplate<Product>> reserved = productProxy.reserve(
                 cartItem.getProductId(),
                 new QuantityRequest(cartItem.getQuantity())
         );

@@ -7,7 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,6 +25,13 @@ public class JwtCookieFilter extends OncePerRequestFilter {
     public JwtCookieFilter(@Value("${app.jwt.secret}") String secret) {
         this.SECRET = secret;
     }
+
+    private static final String[] WHITELIST = {
+            "/v3/api-docs",
+            "/swagger-ui",
+            "/swagger-ui.html",
+            "/actuator"
+    };
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -74,8 +80,14 @@ public class JwtCookieFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-//    @Override
-//    protected boolean shouldNotFilter(HttpServletRequest request) {
-//        return request.getRequestURI().contains("/actuator");
-//    }
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        for (String whitelistPath : WHITELIST) {
+            if (path.startsWith(whitelistPath)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

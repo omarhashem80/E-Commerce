@@ -21,8 +21,28 @@ import java.util.Collections;
 public class JwtCookieFilter extends OncePerRequestFilter {
     private final String SECRET;
 
+    // Whitelisted paths for Actuator & Swagger
+    private static final String[] EXCLUDED_PATHS = {
+            "/actuator", "/actuator/", "/actuator/**",
+            "/swagger-ui", "/swagger-ui/", "/swagger-ui/**",
+            "/v3/api-docs", "/v3/api-docs/**",
+            "/swagger-ui.html"
+    };
+
     public JwtCookieFilter(@Value("${app.jwt.secret}") String secret) {
         this.SECRET = secret;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        for (String excluded : EXCLUDED_PATHS) {
+            // simple prefix match
+            if (path.startsWith(excluded.replace("/**", ""))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

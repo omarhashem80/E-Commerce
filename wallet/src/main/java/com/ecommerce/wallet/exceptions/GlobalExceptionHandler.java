@@ -1,6 +1,6 @@
 package com.ecommerce.wallet.exceptions;
 
-import com.ecommerce.wallet.payloads.ApiResponse;
+import com.ecommerce.wallet.payloads.ResponseTemplate;
 import com.ecommerce.wallet.utils.ResponseBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,32 +16,32 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AuthorizationDeniedException ex) {
+    public ResponseEntity<ResponseTemplate<Void>> handleAccessDenied(AuthorizationDeniedException ex) {
         return ResponseBuilder.failure(HttpStatus.FORBIDDEN, "Access Denied: You do not have permission to perform this action.");
     }
 
     @ExceptionHandler(AlreadyExistsException.class)
-    public ResponseEntity<ApiResponse<Void>> handleUserNameException(AlreadyExistsException ex) {
+    public ResponseEntity<ResponseTemplate<Void>> handleUserNameException(AlreadyExistsException ex) {
         return ResponseBuilder.build(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiResponse<Void>> handleBadCredentials(BadCredentialsException ex) {
+    public ResponseEntity<ResponseTemplate<Void>> handleBadCredentials(BadCredentialsException ex) {
         return ResponseBuilder.failure(HttpStatus.UNAUTHORIZED, "Invalid username or password");
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleNotFoundException(NotFoundException ex) {
+    public ResponseEntity<ResponseTemplate<Void>> handleNotFoundException(NotFoundException ex) {
         return ResponseBuilder.failure(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidOperationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleInvalidOperationException(InvalidOperationException ex) {
+    public ResponseEntity<ResponseTemplate<Void>> handleInvalidOperationException(InvalidOperationException ex) {
         return ResponseBuilder.failure(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<ResponseTemplate<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         String message = String.format(
                 "Parameter '%s' has invalid value '%s'. Expected type: %s",
                 ex.getName(),
@@ -52,13 +52,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ApiResponse<Void>> handleMissingParam(MissingServletRequestParameterException ex) {
+    public ResponseEntity<ResponseTemplate<Void>> handleMissingParam(MissingServletRequestParameterException ex) {
         String message = String.format("Missing required parameter: %s", ex.getParameterName());
         return ResponseBuilder.failure(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ResponseTemplate<Void>> handleValidation(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .findFirst()
@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
+    public ResponseEntity<ResponseTemplate<Void>> handleException(Exception ex) {
         return ResponseBuilder.failure(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.");
     }
 }

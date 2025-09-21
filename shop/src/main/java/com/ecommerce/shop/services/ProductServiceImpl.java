@@ -2,7 +2,7 @@ package com.ecommerce.shop.services;
 
 import com.ecommerce.shop.entities.Product;
 import com.ecommerce.shop.exceptions.ServiceNotFoundException;
-import com.ecommerce.shop.payloads.ApiResponse;
+import com.ecommerce.shop.payloads.ResponseTemplate;
 import com.ecommerce.shop.proxies.ProductProxy;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     @CircuitBreaker(name = "productService", fallbackMethod = "getProductsFallback")
     public List<Product> getProducts() {
         logger.info("Fetching fresh products from external service");
-        ResponseEntity<ApiResponse<List<Product>>> response = productProxy.getProducts();
+        ResponseEntity<ResponseTemplate<List<Product>>> response = productProxy.getProducts();
         List<Product> products = response.getBody().getData();
         logger.info("Successfully fetched {} products", products.size());
         return products;

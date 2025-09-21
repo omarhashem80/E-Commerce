@@ -1,6 +1,5 @@
 package com.ecommerce.wallet.services;
 
-
 import com.ecommerce.wallet.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -64,19 +63,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
-
-            filterChain.doFilter(request, response);
         }
+
+        filterChain.doFilter(request, response);
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-        return path.startsWith("/auth/signup") ||
-                path.startsWith("/auth/login") ||
-                path.startsWith("/auth/forgot-password") ||
-                path.startsWith("/auth/reset-password") ||
-                path.startsWith("/auth/me");
-    }
 
+        return path.startsWith("/auth/") ||
+                path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/actuator");
+    }
 }

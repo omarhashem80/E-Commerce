@@ -25,6 +25,16 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomUserDetailsService userDetailsService;
 
+    private static final String[] SWAGGER_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
+    };
+
+    private static final String[] ACTUATOR_WHITELIST = {
+            "/actuator/**"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -37,11 +47,17 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/auth/**").permitAll()
-//                        .requestMatchers("/h2-console/**").permitAll()
-                                .requestMatchers("/users/**", "/wallets/**").authenticated()
+                        // allow auth APIs without authentication
+                        .requestMatchers("/auth/**").permitAll()
 
-                                .anyRequest().authenticated()
+                        // allow Swagger and Actuator without authentication
+                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
+                        .requestMatchers(ACTUATOR_WHITELIST).permitAll()
+
+                        // protect other APIs
+                        .requestMatchers("/users/**", "/wallets/**").authenticated()
+
+                        .anyRequest().authenticated()
                 )
 
                 .authenticationProvider(authenticationProvider())
@@ -50,7 +66,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
