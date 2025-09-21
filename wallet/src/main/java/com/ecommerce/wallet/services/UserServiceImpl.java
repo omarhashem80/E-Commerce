@@ -1,0 +1,67 @@
+package com.ecommerce.wallet.services;
+
+import com.ecommerce.wallet.entities.Role;
+import com.ecommerce.wallet.entities.User;
+import com.ecommerce.wallet.exceptions.InvalidOperationException;
+import com.ecommerce.wallet.exceptions.NotFoundException;
+import com.ecommerce.wallet.repositories.UserRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@AllArgsConstructor
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User getUserById(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null || !user.isActive())
+            throw new NotFoundException("User with userId: " + userId + " not found");
+        return user;
+    }
+
+    @Override
+    public User updateUser(Long userId, User user) {
+        User existingUser = getUserById(userId);
+        if (user.getEmail() != null) {
+            existingUser.setEmail(user.getEmail());
+        }
+        if (user.getFirstName() != null) {
+            existingUser.setFirstName(user.getFirstName());
+        }
+        if (user.getLastName() != null) {
+            existingUser.setLastName(user.getLastName());
+        }
+        if (user.getUserName() != null) {
+            throw new InvalidOperationException("Username is immutable");
+        }
+        if (user.getRole() != null) {
+            if (user.getRole().equals(Role.ADMIN) || existingUser.getRole().equals(Role.ADMIN)) {
+                throw new InvalidOperationException("Admin can't be updated");
+            }
+            existingUser.setRole(user.getRole());
+        }
+        if (user.getPassword() != null) {
+            existingUser.setPassword(user.getPassword());
+        }
+        return userRepository.save(existingUser);
+    }
+
+    @Override
+    public void deleteUser(Long userId) {
+        User existingUser = getUserById(userId);
+        if (existingUser.getRole().equals(Role.ADMIN)) {
+            throw new InvalidOperationException("Admin can't be deleted");
+        }
+        existingUser.setActive(false);
+        userRepository.save(existingUser);
+    }
+}
