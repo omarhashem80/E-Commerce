@@ -29,7 +29,7 @@ public class JwtAuthGatewayFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
-        if (path.startsWith("/wallet/auth/") || path.startsWith("/actuator/")) {
+        if (path.startsWith("/wallet/auth/") || path.startsWith("/actuator")) {
             return chain.filter(exchange);
         }
 

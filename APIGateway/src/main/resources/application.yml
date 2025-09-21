@@ -25,9 +25,19 @@ app:
     secret: Zy7xP9qL2mT8bV6rY1sE3wK5dH0nF4jQ
 
 management:
-  tracing:
-    sampling:
-      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 logging:
   pattern:
