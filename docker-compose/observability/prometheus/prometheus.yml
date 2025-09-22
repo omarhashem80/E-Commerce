@@ -1,0 +1,34 @@
+global:
+  scrape_interval:     5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'apigateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'apigateway:8765' ]
+
+  - job_name: 'configserver'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'configserver:8888' ]
+
+  - job_name: 'inventory'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'inventory:8000' ]
+
+  - job_name: 'shop'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'shop:8100' ]
+
+  - job_name: 'wallet'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'wallet:8200' ]
+
+  - job_name: 'eurekaserver'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'namingserver:8761' ]

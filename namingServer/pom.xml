@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ecommerce</groupId>
-    <artifactId>namingServer</artifactId>
+    <artifactId>namingserver</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>namingServer</name>
-    <description>namingServer</description>
+    <name>namingserver</name>
+    <description>namingserver</description>
     <url/>
     <licenses>
         <license/>

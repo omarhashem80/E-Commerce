@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>com.omar.microservices</groupId>
-    <artifactId>APIGateway</artifactId>
+    <artifactId>apigateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>APIGateway</name>
     <description>API Gateway for E-Commerce Microservices</description>

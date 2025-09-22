@@ -1,6 +1,6 @@
 spring:
   application:
-    name: "configServer"
+    name: "configserver"
   profiles:
     active: git
   cloud:

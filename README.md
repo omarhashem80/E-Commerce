@@ -1,8 +1,7 @@
-
 # 🌟 **E-Commerce Microservices Platform - Backend Repository** 🌟
 
 Welcome to the **backend repository** of our **E-Commerce Microservices Platform**! 🚀
-This system is designed to provide a **robust, scalable, and modular e-commerce experience**, including shopping, inventory management, wallet transactions, and service discovery. Below is a breakdown of the key features and microservices powering this platform.
+This system provides a **robust, scalable, and modular e-commerce experience**, including shopping, inventory management, wallet transactions, service discovery, and observability. Below is a breakdown of the key features and microservices powering this platform.
 
 ---
 
@@ -16,6 +15,7 @@ The platform offers a **secure and flexible authentication system**:
 * **User registration and login**
 * **Password reset** via email OTP 🔄
 * Secure routing and access management through **API Gateway**
+* **Centralized authentication handling** via API Gateway filters
 
 ---
 
@@ -27,6 +27,7 @@ Manage products and orders efficiently:
 * **Caching** with Caffeine for faster product retrieval
 * **Integration with Inventory and Wallet services** via OpenFeign
 * **JWT-protected endpoints** for security
+* **Database:** `shopdb` (MySQL)
 
 ---
 
@@ -37,6 +38,7 @@ Track stock levels and ensure availability:
 * **Product stock management** (add, update, remove)
 * **Integration with Shop Service** for real-time stock updates
 * **Secure endpoints** using JWT
+* **Database:** `inventorydb` (MySQL)
 
 ---
 
@@ -47,7 +49,8 @@ Handle user wallets and transactions:
 * **Deposit, withdraw, and transfer funds**
 * **Transaction history tracking**
 * **JWT-secured APIs**
-* Integrated with Shop Service for payment processing
+* **Integrated with Shop Service for payment processing**
+* **Database:** `walletdb` (MySQL)
 
 ---
 
@@ -57,7 +60,7 @@ The single entry point for all requests:
 
 * Routes incoming requests to the appropriate microservice
 * Handles **JWT verification** for protected routes
-* Provides **load balancing** and **centralized logging**
+* Provides **load balancing**, **centralized logging**, and **observability**
 * Built with **Spring Cloud Gateway** and **WebFlux**
 
 ---
@@ -67,7 +70,19 @@ The single entry point for all requests:
 * **Eureka Server** for service discovery (`namingServer`) 🕵️‍♂️
 * **Config Server** centralizes configuration (`configServer`) ⚙️
 * Services automatically fetch properties from **Config Server**
-* Dynamic service registration and discovery for scalability
+* Dynamic service registration and discovery for **scalability**
+* Health checks for all microservices
+* Proper Docker networking for inter-service communication
+
+---
+
+### 📊 **Observability & Logging**
+
+* **Grafana** for dashboards
+* **Prometheus** for metrics collection
+* **Loki** for centralized logging (read/write backends)
+* **Tempo** for distributed tracing
+* **Nginx gateway** for Loki endpoints
 
 ---
 
@@ -85,6 +100,8 @@ The single entry point for all requests:
 * **Spring Boot Actuator** enabled for monitoring
 * **OpenFeign** for inter-service communication
 * **Caffeine caching** for fast reads
+* Observability enabled via **OpenTelemetry Java Agent**
+* Fully **Dockerized microservices** with healthchecks
 
 ---
 

@@ -1,6 +1,8 @@
 spring:
   application:
     name: inventory
+  profiles:
+    active: default
 
   main:
     banner-mode: off
@@ -39,16 +41,15 @@ eureka:
     prefer-ip-address: false
     ip-address: 127.0.0.1
     non-secure-port: ${server.port}
-#
-#management:
-#  tracing:
-#    sampling:
-#      probability: 1.0
+
 
 logging:
+  level:
+    com:
+      bank:
+        cards: DEBUG
   pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
-
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
 
 management:
   endpoints:
@@ -61,9 +62,14 @@ management:
     liveness-state:
       enabled: true
   endpoint:
+    shutdown:
+      access: unrestricted
     health:
       probes:
         enabled: true
+  info:
+    env:
+      enabled: true
   metrics:
     tags:
       application: ${spring.application.name}

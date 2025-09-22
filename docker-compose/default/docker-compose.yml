@@ -1,0 +1,252 @@
+version: "3.9"
+
+services:
+  read:
+    image: grafana/loki:3.1.2
+    command: "-config.file=/etc/loki/config.yaml -target=read"
+    ports:
+      - 3101:3100
+      - 7946
+      - 9095
+    volumes:
+      - ../observability/loki/loki-config.yaml:/etc/loki/config.yaml
+    depends_on:
+      - minio
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1" ]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+    networks: &loki-dns
+      ecommerce:
+        aliases:
+          - loki
+
+  write:
+    image: grafana/loki:3.1.2
+    command: "-config.file=/etc/loki/config.yaml -target=write"
+    ports:
+      - 3102:3100
+      - 7946
+      - 9095
+    volumes:
+      - ../observability/loki/loki-config.yaml:/etc/loki/config.yaml
+    depends_on:
+      - minio
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1" ]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+    networks:
+      <<: *loki-dns
+
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /data/loki-data && \
+        mkdir -p /data/loki-ruler && \
+        minio server /data
+    environment:
+      - MINIO_ROOT_USER=loki
+      - MINIO_ROOT_PASSWORD=supersecret
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+      - MINIO_UPDATE=off
+    ports:
+      - 9000
+    volumes:
+      - ./.data/minio:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+
+  gateway:
+    image: nginx:1.27.3
+    depends_on:
+      - read
+      - write
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        cat <<EOF > /etc/nginx/nginx.conf
+        user  nginx;
+        worker_processes  5;
+        events { worker_connections 1000; }
+        http {
+          resolver 127.0.0.11;
+          server {
+            listen 3100;
+            location = / { return 200 'OK'; auth_basic off; }
+            location /api/prom/push { proxy_pass http://write:3100$request_uri; }
+            location /api/prom/tail { 
+              proxy_pass http://read:3100$request_uri; 
+              proxy_set_header Upgrade $http_upgrade; 
+              proxy_set_header Connection "upgrade"; 
+            }
+            location ~ /api/prom/.* { proxy_pass http://read:3100$request_uri; }
+            location /loki/api/v1/push { proxy_pass http://write:3100$request_uri; }
+            location /loki/api/v1/tail { 
+              proxy_pass http://read:3100$request_uri; 
+              proxy_set_header Upgrade $http_upgrade; 
+              proxy_set_header Connection "upgrade"; 
+            }
+            location ~ /loki/api/.* { proxy_pass http://read:3100$request_uri; }
+          }
+        }
+        EOF
+        /docker-entrypoint.sh nginx -g "daemon off;"
+    ports:
+      - "3100:3100"
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
+
+  configserver:
+    image: "omarhashem80/configserver:v1"
+    container_name: configserver-ms
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./libs/opentelemetry-javaagent-2.11.0.jar:/app/libs/opentelemetry-javaagent-2.11.0.jar
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost:8888/actuator/health/readiness || exit 1"]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
+    environment:
+      OTEL_SERVICE_NAME: "configserver"
+
+  namingserver:
+    image: "omarhashem80/namingserver:v1"
+    container_name: namingserver-ms
+    ports:
+      - "8761:8761"
+    volumes:
+      - ./libs/opentelemetry-javaagent-2.11.0.jar:/app/libs/opentelemetry-javaagent-2.11.0.jar
+    depends_on:
+      configserver:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost:8761/actuator/health/readiness || exit 1"]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
+    environment:
+      SPRING_APPLICATION_NAME: "namingserver"
+      OTEL_SERVICE_NAME: "namingserver"
+
+  shop:
+    image: "omarhashem80/shop:v1"
+    container_name: shop-ms
+    ports:
+      - "8100:8100"
+    volumes:
+      - ./libs/opentelemetry-javaagent-2.11.0.jar:/app/libs/opentelemetry-javaagent-2.11.0.jar
+    depends_on:
+      configserver:
+        condition: service_healthy
+      namingserver:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8100/shop/actuator/health/readiness || exit 1" ]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
+    environment:
+      SPRING_APPLICATION_NAME: "shop"
+      OTEL_SERVICE_NAME: "shop"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://host.docker.internal:3306/shopdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+      SPRING_DATASOURCE_USERNAME: "springstudent"
+      SPRING_DATASOURCE_PASSWORD: "springstudent"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://namingserver:8761/eureka/"
+
+
+  inventory:
+      image: "omarhashem80/inventory:v1"
+      container_name: inventory-ms
+      ports:
+        - "8000:8000"
+      volumes:
+        - ./libs/opentelemetry-javaagent-2.11.0.jar:/app/libs/opentelemetry-javaagent-2.11.0.jar
+      depends_on:
+        configserver:
+          condition: service_healthy
+        namingserver:
+          condition: service_healthy
+      healthcheck:
+        test: [ "CMD-SHELL", "curl -f http://localhost:8000/inventory/actuator/health/readiness || exit 1" ]
+        interval: 30s
+        timeout: 20s
+        retries: 10
+        start_period: 30s
+      environment:
+        SPRING_APPLICATION_NAME: "inventory"
+        OTEL_SERVICE_NAME: "inventory"
+        SPRING_DATASOURCE_URL: "jdbc:mysql://host.docker.internal:3306/inventorydb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+        SPRING_DATASOURCE_USERNAME: "springstudent"
+        SPRING_DATASOURCE_PASSWORD: "springstudent"
+        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://namingserver:8761/eureka/"
+
+
+  wallet:
+      image: "omarhashem80/wallet:v1"
+      container_name: wallet-ms
+      ports:
+        - "8200:8200"
+      volumes:
+        - ./libs/opentelemetry-javaagent-2.11.0.jar:/app/libs/opentelemetry-javaagent-2.11.0.jar
+      depends_on:
+        configserver:
+          condition: service_healthy
+        namingserver:
+          condition: service_healthy
+      healthcheck:
+        test: [ "CMD-SHELL", "curl -f http://localhost:8200/wallet/actuator/health/readiness || exit 1" ]
+        interval: 30s
+        timeout: 20s
+        retries: 10
+        start_period: 30s
+      environment:
+        SPRING_APPLICATION_NAME: "wallet"
+        OTEL_SERVICE_NAME: "wallet"
+        SPRING_DATASOURCE_URL: "jdbc:mysql://host.docker.internal:3306/walletdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+        SPRING_DATASOURCE_USERNAME: "springstudent"
+        SPRING_DATASOURCE_PASSWORD: "springstudent"
+        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://namingserver:8761/eureka/"
+
+
+  apigateway:
+      image: "omarhashem80/apigateway:v1"
+      container_name: apigateway-ms
+      ports:
+        - "8765:8765"
+      volumes:
+        - ./libs/opentelemetry-javaagent-2.11.0.jar:/app/libs/opentelemetry-javaagent-2.11.0.jar
+      depends_on:
+        shop:
+          condition: service_healthy
+        wallet:
+          condition: service_healthy
+        inventory:
+          condition: service_healthy
+      environment:
+        SPRING_APPLICATION_NAME: "apigateway"
+        OTEL_SERVICE_NAME: "apigateway"
+        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://namingserver:8761/eureka/"
+
+
+networks:
+  ecommerce:
+    driver: bridge

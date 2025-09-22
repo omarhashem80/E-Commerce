@@ -1,7 +1,10 @@
 spring:
   application:
-    name: namingServer
-
+    name: namingserver
+  config:
+    import: "optional:configserver:http://localhost:8888"
+  profiles:
+    active: default
   main:
     banner-mode: off
 
